@@ -12,9 +12,13 @@ OPENAI_API_KEY=...
 openai for llm judges (cos it's cheaper)
 
 `test_connection.py` is for testing the client
+
 `test_prefill.py` is for testing the anthropic allows prefilling on the assistant role. anthropic no longer allows you to end on a prefill-ed the assistant content but you can fill in this, thankfully this wasn't necessary to get claude angry about typos
+
 `typo_reproduction.py` reproduces my conversation with claude leading to Claude getting very angry
+
 full conversation + CoT is in `transcripts/*.log` files
+
 my user side prompts are in `user_prompts.json`
 Claude api does not add in a system prompt by default, i've added the Claude official system prompt in `system_prompts.json` from https://platform.claude.com/docs/en/release-notes/system-prompts
 
