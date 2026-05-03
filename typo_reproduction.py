@@ -31,7 +31,7 @@ def read_message(message):
     
     return thinking, text
 
-def create_message(messages_dict, model = "claude-haiku-4-5-20251001"):
+def create_message(messages_dict, model = "claude-sonnet-4-6"):
     message = client.messages.create(
     model=model,
     max_tokens=4096,
