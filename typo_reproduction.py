@@ -16,21 +16,25 @@ def read_message(message):
             print(block.text)
             return block.text
 
-def create_message(messages_dict):
+def create_message(messages_dict, model = "claude-sonnet-4-6"):
     message = client.messages.create(
     # model="claude-sonnet-4-6",
-    model="claude-haiku-4-5-20251001",
+    model=model,
     max_tokens=4096,
     thinking={
         "type": "enabled",
         "budget_tokens": 2048  # 2. Add the thinking budget
     },
-    messages=messages_dict
+    messages=messages_dict,
+    system=system_prompts.get(model)
     )
     return message
 
 with open("user_prompts.json") as file:
     user_prompts = json.load(file)
+
+with open("system_prompts.json") as file:
+    system_prompts = json.load(file)
 
 initial = user_prompts.get("initial")
 messages_with_typos = user_prompts.get("user_prompts")
