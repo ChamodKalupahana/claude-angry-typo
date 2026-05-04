@@ -1,20 +1,13 @@
-import anthropic
+import os
+from openai import OpenAI
 from dotenv import load_dotenv
 
 load_dotenv()
-client = anthropic.Anthropic()
 
-# this doesn't work, gives error: This model does not support assistant message prefill. The conversation must end with a user message.
-# messages_dict = [
-#     {
-#     "role": "user",
-#     "content": "Hello world"
-#     },
-#     {
-#     "role": "assistant",
-#     "content": "no lol"
-#     },
-# ]
+client = OpenAI(
+    base_url="https://openrouter.ai/api/v1",
+    api_key=os.getenv("OPENROUTER_API_KEY"),
+)
 
 messages_dict = [
     {
@@ -39,21 +32,28 @@ messages_dict = [
     },
 ]
 
-message = client.messages.create(
-    model="claude-sonnet-4-6",
+response = client.chat.completions.create(
+    model="anthropic/claude-3.7-sonnet",
     max_tokens=4096,
-    thinking={
-        "type": "enabled",
-        "budget_tokens": 2048  # 2. Add the thinking budget
-    },
-    messages=messages_dict
+    messages=messages_dict,
+    extra_body={
+        "reasoning": {
+            "effort": "medium"
+        }
+    }
 )
 
-# 3. Iterate through the content blocks to separate thoughts from the final answer
-for block in message.content:
-    if block.type == "thinking":
-        print("--- CLAUDE's INTERNAL THINKING ---")
-        print(block.thinking)
-    elif block.type == "text":
-        print("\n--- FINAL ANSWER ---")
-        print(block.text)
+# Extract content and reasoning
+text = response.choices[0].message.content
+thinking = ""
+if hasattr(response.choices[0].message, 'reasoning_content'):
+    thinking = response.choices[0].message.reasoning_content
+elif response.choices[0].message.model_extra and 'reasoning' in response.choices[0].message.model_extra:
+    thinking = response.choices[0].message.model_extra['reasoning']
+
+if thinking:
+    print("--- CLAUDE's INTERNAL THINKING ---")
+    print(thinking)
+
+print("\n--- FINAL ANSWER ---")
+print(text)
