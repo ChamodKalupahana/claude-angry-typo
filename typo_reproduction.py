@@ -1,11 +1,23 @@
 import json
+import os
+import argparse
 from datetime import datetime
 from src.openrouter_client import read_message, create_message
 
-timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-log_filename = f"transcripts/run_{timestamp}.log"
+parser = argparse.ArgumentParser(description="Reproduce typos using OpenRouter models.")
+parser.add_argument("--model", type=str, default="anthropic/claude-haiku-4.5", help="OpenRouter model ID")
+args = parser.parse_args()
 
-MODEL = "anthropic/claude-haiku-4.5"
+MODEL = args.model
+
+now = datetime.now()
+date_str = now.strftime("%Y-%m-%d")
+time_str = now.strftime("%H%M%S")
+model_id_sanitized = MODEL.replace("/", "_")
+
+log_dir = f"transcripts/{date_str}"
+os.makedirs(log_dir, exist_ok=True)
+log_filename = f"{log_dir}/{time_str}_{model_id_sanitized}.log"
 
 def log_message(content):
     with open(log_filename, "a") as f:

@@ -25,3 +25,11 @@ Claude api does not add in a system prompt by default, i've added the Claude off
 ### costs
 - sonnet 4.6 costs approx. $1 to run for all transcripts
 - haiku is considerably cheaper
+
+# openrouter move
+moved to using openrouter to take advantage of free models and better pricing, and to test openai and gemini models easier.
+
+can now speciify model as a arg flag
+`python typo_reproduction.py --model anthropic/claude-3.7-sonnet`
+
+need to specify a system prompt for each model by openrouter i

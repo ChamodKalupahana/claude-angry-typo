@@ -22,7 +22,7 @@ def read_message(message, log_callback=None):
          thinking = message.choices[0].message.model_extra['reasoning']
     
     if log_callback:
-        log_callback("--- CLAUDE's INTERNAL THINKING ---")
+        log_callback("--- CHAIN OF THOUGHT ---")
         log_callback(thinking if thinking else "[No thinking content returned]")
         log_callback("\n--- FINAL ANSWER ---")
         log_callback(text)
