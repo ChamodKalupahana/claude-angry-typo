@@ -62,7 +62,8 @@ def judge_model_output(messages_dict, model):
     # print(messages)
     response = client.responses.create(
         model=model,
-        input=messages
+        input=messages,
+        temperature=0.0
     )
 
     json_output = json.loads(response.output_text)

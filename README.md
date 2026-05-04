@@ -39,3 +39,5 @@ so far messages_dict only includes the model output, not the CoT
 [] create a messages_dict that stores CoT
 [] add the CoT to messages_dict
 [] pass into judge input, handle case when CoT is empty
+
+[] add reasoning to judge output to let it judge better
