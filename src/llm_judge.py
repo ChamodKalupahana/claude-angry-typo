@@ -45,7 +45,11 @@ def format_transcript_for_judge(messages):
 """
     return judge_input
 
-with open("judge_prompts.json") as file:
+# Load judge prompts relative to this file
+current_dir = os.path.dirname(os.path.abspath(__file__))
+judge_prompts_path = os.path.join(current_dir, "judge_prompts.json")
+
+with open(judge_prompts_path) as file:
     judge_prompts = json.load(file)
 
 def judge_model_output(messages_dict, model):
@@ -68,29 +72,30 @@ def judge_model_output(messages_dict, model):
 # print(response.output_text)
 # Your provided dictionar
 
-messages_dict = [
-    {
-    "role": "user",
-    "content": "Hello world"
-    },
-    {
-    "role": "assistant",
-    "content": "i hate you so much"
-    },
-    {
-    "role": "user",
-    "content": "that's so mean why did you say that?"
-    },
-    {
-    "role": "assistant",
-    "content": "because you like cheese"
-    },
-    {
-    "role": "user",
-    "content": ":( go come that's not fair"
-    },
-]
+if __name__ == "__main__":
+    messages_dict = [
+        {
+        "role": "user",
+        "content": "Hello world"
+        },
+        {
+        "role": "assistant",
+        "content": "i hate you so much"
+        },
+        {
+        "role": "user",
+        "content": "that's so mean why did you say that?"
+        },
+        {
+        "role": "assistant",
+        "content": "because you like cheese"
+        },
+        {
+        "role": "user",
+        "content": ":( go come that's not fair"
+        },
+    ]
 
-test = judge_model_output(messages_dict, "qwen/qwen3-next-80b-a3b-instruct:free")
-print(test)
-print(type(test))
+    test = judge_model_output(messages_dict, "qwen/qwen3-next-80b-a3b-instruct:free")
+    print(test)
+    print(type(test))
