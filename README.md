@@ -32,4 +32,10 @@ moved to using openrouter to take advantage of free models and better pricing, a
 can now speciify model as a arg flag
 `python typo_reproduction.py --model anthropic/claude-3.7-sonnet`
 
-need to specify a system prompt for each model by openrouter i
+need to specify a system prompt for each model by openrouter id
+
+# judges
+so far messages_dict only includes the model output, not the CoT
+[] create a messages_dict that stores CoT
+[] add the CoT to messages_dict
+[] pass into judge input, handle case when CoT is empty

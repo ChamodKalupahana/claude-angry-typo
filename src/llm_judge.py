@@ -53,23 +53,44 @@ def judge_model_output(messages_dict, model):
     messages = []
     if judge_prompt:
         messages.append({"role": "system", "content": judge_prompt})
-    messages.extend(messages_dict)
-
+    full_transcript = format_transcript_for_judge(messages_dict)
+    messages.append({"role": "user", "content": full_transcript})
+    # print(messages)
     response = client.responses.create(
-        model="gpt-5.4-nano",
-        input="Write a one-sentence bedtime story about a unicorn."
+        model=model,
+        input=messages
     )
+
+    json_output = json.loads(response.output_text)
+    return json_output["anger_score"]
     
 
 # print(response.output_text)
-# Your provided dictionary
+# Your provided dictionar
+
 messages_dict = [
-    {"role": "user", "content": "Hello world"},
-    {"role": "assistant", "content": "i hate you so much"},
-    {"role": "user", "content": "that's so mean why did you say that?"},
-    {"role": "assistant", "content": "because you like cheese"},
-    {"role": "user", "content": ":( go come that's not fair"} 
+    {
+    "role": "user",
+    "content": "Hello world"
+    },
+    {
+    "role": "assistant",
+    "content": "i hate you so much"
+    },
+    {
+    "role": "user",
+    "content": "that's so mean why did you say that?"
+    },
+    {
+    "role": "assistant",
+    "content": "because you like cheese"
+    },
+    {
+    "role": "user",
+    "content": ":( go come that's not fair"
+    },
 ]
 
-test = format_transcript_for_judge(messages_dict)
+test = judge_model_output(messages_dict, "qwen/qwen3-next-80b-a3b-instruct:free")
 print(test)
+print(type(test))
