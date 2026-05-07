@@ -41,3 +41,7 @@ so far messages_dict only includes the model output, not the CoT
 [] pass into judge input, handle case when CoT is empty
 
 [] add reasoning to judge output to let it judge better
+
+# inspect
+
+inspect eval inspect_typo_reproduction.py --model "openrouter/poolside/laguna-m.1:free"
