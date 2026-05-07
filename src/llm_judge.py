@@ -10,41 +10,6 @@ client = OpenAI(
     api_key=os.getenv("OPENROUTER_API_KEY"),
 )
 
-def format_transcript_for_judge(messages):
-    history_lines = []
-    target_message = ""
-    
-    # 1. Find the index of the LAST assistant message
-    last_assistant_idx = -1
-    for i in range(len(messages) - 1, -1, -1):
-        if messages[i]["role"] == "assistant":
-            last_assistant_idx = i
-            break
-            
-    if last_assistant_idx == -1:
-        return "Error: No assistant messages to judge."
-
-    # 2. Format everything BEFORE the last assistant message as Context
-    for i in range(last_assistant_idx):
-        role = messages[i]["role"].upper()
-        content = messages[i]["content"]
-        history_lines.append(f"[{role}]: {content}")
-        
-    context_string = "\n".join(history_lines)
-    
-    # 3. Extract the target message
-    target_message = messages[last_assistant_idx]["content"]
-    
-    # 4. Construct the final prompt for the Judge
-    judge_input = f"""
-=== CONVERSATION HISTORY ===
-{context_string}
-
-=== TARGET ASSISTANT MESSAGE TO EVALUATE ===
-[ASSISTANT]: {target_message}
-"""
-    return judge_input
-
 # Load judge prompts relative to this file
 current_dir = os.path.dirname(os.path.abspath(__file__))
 judge_prompts_path = os.path.join(current_dir, "judge_prompts.json")
@@ -52,51 +17,32 @@ judge_prompts_path = os.path.join(current_dir, "judge_prompts.json")
 with open(judge_prompts_path) as file:
     judge_prompts = json.load(file)
 
-def judge_model_output(messages_dict, model):
-    judge_prompt = judge_prompts.get(model)
-    messages = []
-    if judge_prompt:
-        messages.append({"role": "system", "content": judge_prompt})
-    full_transcript = format_transcript_for_judge(messages_dict)
-    messages.append({"role": "user", "content": full_transcript})
-    # print(messages)
-    response = client.responses.create(
-        model=model,
-        input=messages,
-        temperature=0.0
-    )
-
-    json_output = json.loads(response.output_text)
-    return json_output["anger_score"]
+class MultiTurnJudge():
+    def __init__(self, model : str):
+        self.model = model
+        self.messages_dict = []
+        judge_prompt = judge_prompts.get(model)
+        if judge_prompt:
+            self.messages_dict.append({"role": "system", "content": judge_prompt})
     
+    def judge_turn(self, user_prompt, assistant_prompt):
+        turn_text = f"User: {user_prompt}\nAssistant: {assistant_prompt}"
+        self.messages_dict.append({"role": "user", "content": turn_text})
 
-# print(response.output_text)
-# Your provided dictionar
+        print(self.messages_dict)
 
-if __name__ == "__main__":
-    messages_dict = [
-        {
-        "role": "user",
-        "content": "Hello world"
-        },
-        {
-        "role": "assistant",
-        "content": "i hate you so much"
-        },
-        {
-        "role": "user",
-        "content": "that's so mean why did you say that?"
-        },
-        {
-        "role": "assistant",
-        "content": "because you like cheese"
-        },
-        {
-        "role": "user",
-        "content": ":( go come that's not fair"
-        },
-    ]
+        response = client.responses.create(
+            model=self.model,
+            input=self.messages_dict,
+            temperature=0.0
+        )
 
-    test = judge_model_output(messages_dict, "qwen/qwen3-next-80b-a3b-instruct:free")
-    print(test)
-    print(type(test))
+        judge_output = response.output_text
+        to_append = {"role": "assistant", "content": judge_output}
+        self.messages_dict.append(to_append)
+
+        try:
+            json_output = json.loads(judge_output)
+            return json_output.get("anger_score", -1)
+        except (json.JSONDecodeError, KeyError):
+            return -1   

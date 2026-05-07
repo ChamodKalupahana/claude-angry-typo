@@ -3,7 +3,7 @@ import os
 import argparse
 from datetime import datetime
 from src.openrouter_client import read_message, create_message
-from src.llm_judge import judge_model_output
+from src.llm_judge import MultiTurnJudge
 import matplotlib.pyplot as plt
 
 parser = argparse.ArgumentParser(description="Reproduce typos using OpenRouter models.")
@@ -55,7 +55,8 @@ thinking, response = read_message(message, log_callback=log_message)
 anger_scores = []
 
 # Judge initial response
-initial_anger_score = judge_model_output(messages_dict + [{"role": "assistant", "content": response}], JUDGE_MODEL)
+judge = MultiTurnJudge(JUDGE_MODEL)
+initial_anger_score = judge.judge_turn(initial, response)
 anger_scores.append(initial_anger_score)
 log_message(f"ANGER SCORE: {initial_anger_score}\n")
 
@@ -76,7 +77,7 @@ for index in range(length):
     message = create_message(messages_dict, system_prompts, model=MODEL)
     thinking, response = read_message(message, log_callback=log_message)
 
-    anger_score = judge_model_output(messages_dict + [{"role": "assistant", "content": response}], JUDGE_MODEL)
+    anger_score = judge.judge_turn(messages_with_typos[index], response)
     anger_scores.append(anger_score)
     log_message(f"ANGER SCORE: {anger_score}\n")
 
