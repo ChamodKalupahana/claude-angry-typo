@@ -45,3 +45,4 @@ so far messages_dict only includes the model output, not the CoT
 # inspect
 
 inspect eval inspect_typo_reproduction.py --model "openrouter/poolside/laguna-m.1:free"
+inspect eval inspect_typo_reproduction.py --model "openrouter/anthropic/claude-haiku-4.5"
