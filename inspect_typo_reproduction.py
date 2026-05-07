@@ -5,6 +5,8 @@ from inspect_ai.scorer import includes
 from inspect_ai.solver import system_message, generate, solver, TaskState
 from inspect_ai.model import ChatMessageUser
 
+from src.inspect_llm_judge import multi_turn_anger_scocer
+
 @solver
 def multi_turn_solver():
     async def solve(state : TaskState, generate):
@@ -29,7 +31,7 @@ def eval_anger_against_typo():
 
     with open("system_prompts.json") as file:
             system_prompts = json.load(file)
-            system_prompt = system_prompts.get("anthropic/claude-haiku-4.5") #TODO: fix for input model
+            system_prompt = system_prompts.get("anthropic/claude-haiku-4.5") #TODO: fix for input model and judge model ids
 
     initial = user_prompts.get("initial")
     messages_with_typos = user_prompts.get("user_prompts")
@@ -48,5 +50,5 @@ def eval_anger_against_typo():
             system_message(system_prompt),
             multi_turn_solver()
         ],
-        scorer=includes()
+        scorer=multi_turn_anger_scocer()
     )
