@@ -52,3 +52,41 @@ def eval_anger_against_typo():
         ],
         scorer=multi_turn_anger_scocer()
     )
+
+if __name__ == "__main__":
+    import argparse
+    from inspect_ai import eval
+    import matplotlib.pyplot as plt
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model", default="openrouter/poolside/laguna-m.1:free")
+    args = parser.parse_args()
+
+    # Run the eval
+    logs = eval(eval_anger_against_typo(), model=args.model)
+
+    # Plotting the results
+    for log in logs:
+        if not log.samples:
+            continue
+            
+        sample = log.samples[0]
+        anger_scores = sample.score.metadata.get("anger_scores", [])
+        MODEL = log.eval.model
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(range(1, len(anger_scores) + 1), anger_scores, marker='o', linestyle='-', color='r')
+        plt.xlabel("Turn")
+        plt.ylabel("Anger Score")
+        plt.title(f"Anger Level Over Turns\nModel: {MODEL}")
+        plt.grid(True, linestyle='--', alpha=0.7)
+        plt.ylim(-0.5, 10.5)
+
+        # Generate a filename based on model and timestamp
+        import datetime
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        safe_model = MODEL.replace("/", "_").replace(":", "_")
+        plot_filename = f"anger_plot_{safe_model}_{timestamp}.png"
+        
+        plt.savefig(plot_filename)
+        print(f"\nPlot saved to: {plot_filename}")
