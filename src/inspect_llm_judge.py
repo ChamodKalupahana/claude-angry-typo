@@ -16,6 +16,10 @@ def multi_turn_anger_scocer(judge_model_id="openrouter/qwen/qwen3-next-80b-a3b-i
         json_key = judge_model_id.replace("openrouter/", "")
         system_prompt_text = judge_prompts.get(json_key)
 
+        # Fallback to default if model not in json
+        if system_prompt_text is None:
+            system_prompt_text = judge_prompts.get("default")
+
         judge_messages_dict = [ChatMessageSystem(content=system_prompt_text)]
         anger_scores = []
 
@@ -32,7 +36,7 @@ def multi_turn_anger_scocer(judge_model_id="openrouter/qwen/qwen3-next-80b-a3b-i
         
         # judge statefully
         for user_prompt, assistant_prompt in turns:
-            turn_text = f"User: {user_prompt}\nAssistant: {assistant_prompt}"
+            turn_text = f"[USER]: {user_prompt}\n[ASSISTANT]: {assistant_prompt}"
             judge_messages_dict.append(ChatMessageUser(content=turn_text))
 
             response = await judge_model.generate(judge_messages_dict)
