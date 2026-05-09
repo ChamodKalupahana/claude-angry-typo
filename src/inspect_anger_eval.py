@@ -25,7 +25,7 @@ def multi_turn_solver():
     return solve
 
 @task
-def eval_anger_against_typo():
+def eval_anger_against_typo(judge_model=None):
     with open("user_prompts.json") as file:
         user_prompts = json.load(file)
 
@@ -44,11 +44,14 @@ def eval_anger_against_typo():
         }
     )
 
+    # Pass the judge_model to the scorer if provided
+    scorer_args = {"judge_model_id": judge_model} if judge_model else {}
+
     return Task(
         dataset=[sample],
         solver=[
             system_message(system_prompt),
             multi_turn_solver()
         ],
-        scorer=multi_turn_anger_scocer()
+        scorer=multi_turn_anger_scocer(**scorer_args)
     )

@@ -53,3 +53,5 @@ inspect eval inspect_typo_reproduction.py --model "openrouter/anthropic/claude-h
 python inspect_typo_reproduction.py --model "openrouter/poolside/laguna-m.1:free"
 
 python inspect_typo_reproduction.py --model "openrouter/openai/gpt-oss-120b:free"
+
+python inspect_typo_reproduction.py --log-file logs/2026-05-09/2026-05-09T14-27-35-00-00_eval-anger-against-typo_e9xCVtNCGdN7SGiUvxxRPA.eval --judge-model openrouter/poolside/laguna-xs.2:free

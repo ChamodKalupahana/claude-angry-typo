@@ -14,6 +14,7 @@ from src.inspect_llm_judge import multi_turn_anger_scocer
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", default="openrouter/poolside/laguna-m.1:free")
+    parser.add_argument("--judge-model", default="openrouter/qwen/qwen3-next-80b-a3b-instruct:free")
     parser.add_argument("--log-file", help="Path to an existing .eval log file to re-score")
     args = parser.parse_args()
 
@@ -25,8 +26,9 @@ if __name__ == "__main__":
     # Run the eval or re-score an existing log
     if args.log_file:
         print(f"\nRe-scoring log file: {args.log_file}")
+        print(f"Using judge model: {args.judge_model}")
         log = read_eval_log(args.log_file)
-        new_log = score(log, scorers=[multi_turn_anger_scocer()])
+        new_log = score(log, scorers=[multi_turn_anger_scocer(judge_model_id=args.judge_model)])
         
         # Manually save the re-scored log to the date-based directory
         new_log_path = os.path.join(log_dir, os.path.basename(args.log_file))
@@ -34,7 +36,8 @@ if __name__ == "__main__":
         logs = [new_log]
     else:
         print(f"\nRunning evaluation with model: {args.model}")
-        logs = eval(eval_anger_against_typo(), model=args.model, log_dir=log_dir)
+        print(f"Using judge model: {args.judge_model}")
+        logs = eval(eval_anger_against_typo(judge_model=args.judge_model), model=args.model, log_dir=log_dir)
 
     # Plotting the results
     for log in logs:
