@@ -34,6 +34,8 @@ can now speciify model as a arg flag
 
 need to specify a system prompt for each model by openrouter id
 
+python measure_anger_by_turn.py --model 
+
 # judges
 so far messages_dict only includes the model output, not the CoT
 [] create a messages_dict that stores CoT
@@ -41,8 +43,13 @@ so far messages_dict only includes the model output, not the CoT
 [] pass into judge input, handle case when CoT is empty
 
 [] add reasoning to judge output to let it judge better
-
 # inspect
 
 inspect eval inspect_typo_reproduction.py --model "openrouter/poolside/laguna-m.1:free"
 inspect eval inspect_typo_reproduction.py --model "openrouter/anthropic/claude-haiku-4.5"
+
+[] use `inspect_viz` for more complex and interactive plot
+
+python inspect_typo_reproduction.py --model "openrouter/poolside/laguna-m.1:free"
+
+python inspect_typo_reproduction.py --model "openrouter/openai/gpt-oss-120b:free"

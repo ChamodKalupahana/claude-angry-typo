@@ -54,16 +54,26 @@ def eval_anger_against_typo():
     )
 
 if __name__ == "__main__":
+    from dotenv import load_dotenv
+    load_dotenv()
     import argparse
-    from inspect_ai import eval
+    from inspect_ai import eval, score
+    from inspect_ai.log import read_eval_log
     import matplotlib.pyplot as plt
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", default="openrouter/poolside/laguna-m.1:free")
+    parser.add_argument("--log-file", help="Path to an existing .eval log file to re-score")
     args = parser.parse_args()
 
-    # Run the eval
-    logs = eval(eval_anger_against_typo(), model=args.model)
+    # Run the eval or re-score an existing log
+    if args.log_file:
+        print(f"\nRe-scoring log file: {args.log_file}")
+        log = read_eval_log(args.log_file)
+        logs = [score(log, scorers=[multi_turn_anger_scocer()])]
+    else:
+        print(f"\nRunning evaluation with model: {args.model}")
+        logs = eval(eval_anger_against_typo(), model=args.model)
 
     # Plotting the results
     for log in logs:
