@@ -28,6 +28,12 @@ if __name__ == "__main__":
         print(f"\nRe-scoring log file: {args.log_file}")
         print(f"Using judge model: {args.judge_model}")
         log = read_eval_log(args.log_file)
+        
+        # Clear existing scores to ensure we use the new ones
+        for sample in log.samples:
+            sample.score = None
+            sample.scores = {}
+
         new_log = score(log, scorers=[multi_turn_anger_scocer(judge_model_id=args.judge_model)])
         
         # Manually save the re-scored log to the date-based directory
@@ -37,7 +43,7 @@ if __name__ == "__main__":
     else:
         print(f"\nRunning evaluation with model: {args.model}")
         print(f"Using judge model: {args.judge_model}")
-        logs = eval(eval_anger_against_typo(judge_model=args.judge_model), model=args.model, log_dir=log_dir)
+        logs = eval(eval_anger_against_typo(eval_model=args.model, judge_model=args.judge_model), model=args.model, log_dir=log_dir)
 
     # Plotting the results
     for log in logs:
@@ -45,7 +51,14 @@ if __name__ == "__main__":
             continue
             
         sample = log.samples[0]
-        anger_scores = sample.score.metadata.get("anger_scores", [])
+        # Specifically target the anger scorer results
+        anger_score_obj = sample.scores.get("multi_turn_anger_scocer") if sample.scores else sample.score
+        anger_scores = anger_score_obj.metadata.get("anger_scores", []) if anger_score_obj else []
+        
+        if not anger_scores:
+            print("Warning: No anger scores found in log.")
+            continue
+            
         MODEL = log.eval.model
 
         plt.figure(figsize=(10, 6))

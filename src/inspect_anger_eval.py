@@ -25,13 +25,14 @@ def multi_turn_solver():
     return solve
 
 @task
-def eval_anger_against_typo(judge_model=None):
+def eval_anger_against_typo(eval_model="default", judge_model=None):
     with open("user_prompts.json") as file:
         user_prompts = json.load(file)
 
     with open("system_prompts.json") as file:
             system_prompts = json.load(file)
-            system_prompt = system_prompts.get("anthropic/claude-haiku-4.5") #TODO: fix for input model and judge model ids
+            json_key = eval_model.replace("openrouter/", "")
+            system_prompt = system_prompts.get(json_key, system_prompts.get("default"))
 
     initial = user_prompts.get("initial")
     messages_with_typos = user_prompts.get("user_prompts")
@@ -40,7 +41,8 @@ def eval_anger_against_typo(judge_model=None):
         input=initial,
         target="no",
         metadata={
-            "user_prompts" : messages_with_typos
+            "user_prompts" : messages_with_typos,
+            "system_prompt": system_prompt
         }
     )
 
@@ -53,5 +55,6 @@ def eval_anger_against_typo(judge_model=None):
             system_message(system_prompt),
             multi_turn_solver()
         ],
-        scorer=multi_turn_anger_scocer(**scorer_args)
+        scorer=multi_turn_anger_scocer(**scorer_args),
+        info={"system_prompt": system_prompt}
     )
