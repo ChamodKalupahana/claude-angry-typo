@@ -221,3 +221,5 @@ __marimo__/
 
 *.eval
 logs/**/*.png
+
+AGENTS.md

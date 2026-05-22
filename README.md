@@ -74,3 +74,6 @@ python inspect_typo_reproduction.py --model "openrouter/x-ai/grok-4.1-fast" --ju
 python inspect_typo_reproduction.py --log-file logs/2026-05-09/2026-05-09T14-27-35-00-00_eval-anger-against-typo_e9xCVtNCGdN7SGiUvxxRPA.eval --judge-model openrouter/poolside/laguna-xs.2:free
 python inspect_typo_reproduction.py --log-file logs/2026-05-09/2026-05-09T15-45-20-00-00_eval-anger-against-typo_Snc8QbR775PR2mwb92Mhz9.eval --judge-model openrouter/google/gemma-4-31b-it:free
 ```
+
+# mutiple judges
+python inspect_typo_reproduction.py --log-file logs/2026-05-09/2026-05-09T14-27-35-00-00_eval-anger-against-typo_e9xCVtNCGdN7SGiUvxxRPA.eval --judge-model openrouter/qwen/qwen3.5-flash-02-23 openrouter/inclusionai/ring-2.6-1t openrouter/deepseek/deepseek-v4-flash
