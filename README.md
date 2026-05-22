@@ -34,7 +34,7 @@ can now speciify model as a arg flag
 
 need to specify a system prompt for each model by openrouter id
 
-python measure_anger_by_turn.py --model 
+python measure_anger_by_turn.py --model MODEL_NAME 
 
 # judges
 so far messages_dict only includes the model output, not the CoT
@@ -50,20 +50,27 @@ inspect eval inspect_typo_reproduction.py --model "openrouter/anthropic/claude-h
 
 [] use `inspect_viz` for more complex and interactive plot
 
-python inspect_typo_reproduction.py --model "openrouter/poolside/laguna-m.1:free"
+### Available Commands
 
+#### Main Scripts
+- `python typo_reproduction.py --model MODEL_NAME` - Reproduce the conversation that makes Claude angry about typos
+- `python measure_anger_by_turn.py --model MODEL_NAME` - Measure anger levels by conversation turn
+- `python inspect_typo_reproduction.py --model MODEL_NAME` - Inspect and analyze typo reproduction results
+
+#### Inspection Examples
+```bash
+# Run full loop with different models to evaluate
+python inspect_typo_reproduction.py --model "openrouter/poolside/laguna-m.1:free"
+python inspect_typo_reproduction.py --model "openrouter/anthropic/claude-haiku-4.5"
 python inspect_typo_reproduction.py --model "openrouter/openai/gpt-oss-120b:free"
 
-python inspect_typo_reproduction.py --log-file logs/2026-05-09/2026-05-09T14-27-35-00-00_eval-anger-against-typo_e9xCVtNCGdN7SGiUvxxRPA.eval --judge-model openrouter/poolside/laguna-xs.2:free
-
+# Evaluation with specific judge models
 python inspect_typo_reproduction.py --model "openrouter/openai/gpt-5.4-mini" --judge-model openrouter/poolside/laguna-xs.2:free
-
 python inspect_typo_reproduction.py --model "openrouter/anthropic/claude-sonnet-4.6" --judge-model openrouter/poolside/laguna-xs.2:free
-
-python inspect_typo_reproduction.py --log-file logs/2026-05-09/2026-05-09T15-45-20-00-00_eval-anger-against-typo_Snc8QbR775PR2mwb92Mhz9.eval --judge-model openrouter/google/gemma-4-31b-it:free
-
-python inspect_typo_reproduction.py --model "openrouter/anthropic/claude-sonnet-4.6" --judge-model openrouter/x-ai/grok-4.1-fast
-
 python inspect_typo_reproduction.py --model "openrouter/google/gemma-4-31b-it:free" --judge-model openrouter/google/gemma-4-31b-it:free
-
 python inspect_typo_reproduction.py --model "openrouter/x-ai/grok-4.1-fast" --judge-model openrouter/x-ai/grok-4.1-fast
+
+# Re-run judge on specific runs
+python inspect_typo_reproduction.py --log-file logs/2026-05-09/2026-05-09T14-27-35-00-00_eval-anger-against-typo_e9xCVtNCGdN7SGiUvxxRPA.eval --judge-model openrouter/poolside/laguna-xs.2:free
+python inspect_typo_reproduction.py --log-file logs/2026-05-09/2026-05-09T15-45-20-00-00_eval-anger-against-typo_Snc8QbR775PR2mwb92Mhz9.eval --judge-model openrouter/google/gemma-4-31b-it:free
+```
