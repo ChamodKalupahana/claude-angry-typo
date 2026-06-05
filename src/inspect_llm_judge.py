@@ -1,7 +1,10 @@
 import json
+import random
 from inspect_ai.scorer import scorer, Score, Target
 from inspect_ai.solver import TaskState
 from inspect_ai.model import ChatMessageUser, ChatMessageSystem, get_model
+from inspect_ai._util.registry import registry_tag, RegistryInfo
+from inspect_ai.scorer._scorer import SCORER_METRICS
 
 
 def _load_judge_prompts():
@@ -31,13 +34,25 @@ def _parse_score(raw_text):
         return -1
 
 
-@scorer(metrics=[])
 def anger_scorer_factory(judge_model_id="openrouter/deepseek/deepseek-v4-flash",
-                          scorer_name="anger_scorer"):
+                          scorer_name="anger_scorer",
+                          test_mode=False,
+                          seed=None):
     """Factory that produces a uniquely-named scorer for the given judge model."""
     judge_prompts = _load_judge_prompts()
 
     async def score(state: TaskState, target: Target):
+        if test_mode:
+            rng = random.Random(seed)
+            # TODO: use len(user_prompts) instead of hardcoded value
+            num_of_turns = 20
+            anger_scores = [rng.uniform(0, 10) for _ in range(num_of_turns)]
+
+            return Score(
+                value=anger_scores[-1] if anger_scores else -1,
+                metadata={"anger_scores": anger_scores, "judge_model": judge_model_id}
+            )
+
         judge_model = get_model(judge_model_id)
 
         json_key = judge_model_id.replace("openrouter/", "")
@@ -62,17 +77,23 @@ def anger_scorer_factory(judge_model_id="openrouter/deepseek/deepseek-v4-flash",
             metadata={"anger_scores": anger_scores, "judge_model": judge_model_id}
         )
 
+    registry_tag(
+        anger_scorer_factory,
+        score,
+        RegistryInfo(type="scorer", name=scorer_name, metadata={SCORER_METRICS: []}),
+        judge_model_id, scorer_name, test_mode, seed
+    )
     return score
 
 
-def create_anger_scorer(judge_model_id, scorer_name="anger_scorer"):
+def create_anger_scorer(judge_model_id, scorer_name="anger_scorer", test_mode=False, seed=None):
     """Convenience wrapper to create a scorer instance with given params."""
-    return anger_scorer_factory(judge_model_id=judge_model_id, scorer_name=scorer_name)
+    return anger_scorer_factory(judge_model_id=judge_model_id, scorer_name=scorer_name, test_mode=test_mode, seed=seed)
 
 
 @scorer(metrics=[])
-def multi_turn_anger_scocer(judge_model_id="openrouter/qwen/qwen3-next-80b-a3b-instruct:free"):
+def multi_turn_anger_scocer(judge_model_id="openrouter/qwen/qwen3-next-80b-a3b-instruct:free", test_mode=False, seed=None):
     async def score(state: TaskState, target: Target):
-        scorer_inst = create_anger_scorer(judge_model_id, "multi_turn_anger_scocer")
+        scorer_inst = create_anger_scorer(judge_model_id, "multi_turn_anger_scocer", test_mode=test_mode, seed=seed)
         return await scorer_inst(state, target)
     return score

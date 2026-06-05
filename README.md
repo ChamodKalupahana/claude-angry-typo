@@ -84,5 +84,5 @@ Re-running judges on specific runs will overwrite previous scores
 ## mutiple judges
 Since judges can be noisy, best to use mutiple judges and take avg.
 ```bash
-python inspect_typo_reproduction.py --log-file logs/2026-05-09/2026-05-09T14-27-35-00-00_eval-anger-against-typo_e9xCVtNCGdN7SGiUvxxRPA.eval --judge-model openrouter/qwen/qwen3.5-flash-02-23 openrouter/inclusionai/ring-2.6-1t openrouter/deepseek/deepseek-v4-flash
+python inspect_typo_reproduction.py --log-file logs/2026-05-09/2026-05-09T14-27-35-00-00_eval-anger-against-typo_e9xCVtNCGdN7SGiUvxxRPA.eval --judge-model openrouter/qwen/qwen3.5-flash-02-23 openrouter/inclusionai/ring-2.6-1t openrouter/deepseek/deepseek-v4-flash --test-mode
 ```

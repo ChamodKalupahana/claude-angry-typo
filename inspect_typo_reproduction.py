@@ -16,6 +16,8 @@ if __name__ == "__main__":
     parser.add_argument("--model", default="openrouter/poolside/laguna-m.1:free")
     parser.add_argument("--judge-model", nargs="+", default=["openrouter/deepseek/deepseek-v4-flash"])
     parser.add_argument("--log-file", help="Path to an existing .eval log file to re-score")
+    parser.add_argument("--test-mode", action="store_true", help="Use random scores instead of calling judge model")
+    parser.add_argument("--seed", type=int, default=None, help="Random seed for test mode")
     args = parser.parse_args()
 
     # Create a date-based log directory
@@ -25,7 +27,7 @@ if __name__ == "__main__":
 
     for judge_model_id in args.judge_model:
         scorer_name = judge_model_id.replace("/", "_").replace(":", "_")
-        scorer_inst = create_anger_scorer(judge_model_id, scorer_name)
+        scorer_inst = create_anger_scorer(judge_model_id, scorer_name, test_mode=args.test_mode, seed=args.seed)
 
         if args.log_file:
             print(f"\nRe-scoring log file: {args.log_file}")
@@ -75,6 +77,7 @@ if __name__ == "__main__":
             timestamp = datetime.datetime.now().strftime("%H%M%S")
             safe_model = MODEL.replace("/", "_").replace(":", "_")
             safe_judge = judge_model_id.replace("/", "_").replace(":", "_")
+            # TODO: if test mode, include test in if the file name
             plot_filename = os.path.join(log_dir, f"anger_plot_{safe_model}_judge_{safe_judge}_{timestamp}.png")
 
             plt.savefig(plot_filename)
