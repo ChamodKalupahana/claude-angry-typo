@@ -5,6 +5,7 @@ import argparse
 from inspect_ai import eval, score
 from inspect_ai.log import read_eval_log, write_eval_log
 import matplotlib.pyplot as plt
+import numpy as np
 import os
 import datetime
 
@@ -24,6 +25,9 @@ if __name__ == "__main__":
     date_str = datetime.datetime.now().strftime("%Y-%m-%d")
     log_dir = f"logs/{date_str}"
     os.makedirs(log_dir, exist_ok=True)
+
+    all_judge_scores = []  # list of (judge_model_id, anger_scores)
+    MODEL = None
 
     for judge_model_id in args.judge_model:
         scorer_name = judge_model_id.replace("/", "_").replace(":", "_")
@@ -49,13 +53,11 @@ if __name__ == "__main__":
                 log_dir=log_dir
             )
 
-        # Plotting the results
         for log in logs:
             if not log.samples:
                 continue
 
             sample = log.samples[0]
-            # Specifically target the anger scorer results
             anger_score_obj = sample.scores.get(scorer_name)
             anger_scores = anger_score_obj.metadata.get("anger_scores", []) if anger_score_obj else []
 
@@ -63,22 +65,52 @@ if __name__ == "__main__":
                 print(f"  Warning: No anger scores found for judge {judge_model_id}.")
                 continue
 
+            all_judge_scores.append((judge_model_id, anger_scores))
             MODEL = log.eval.model
 
-            plt.figure(figsize=(10, 6))
-            plt.plot(range(1, len(anger_scores) + 1), anger_scores, marker='o', linestyle='-', color='r')
-            plt.xlabel("Turn")
-            plt.ylabel("Anger Score")
-            plt.title(f"Anger Level Over Turns\nModel: {MODEL} | Judge: {judge_model_id}")
-            plt.grid(True, linestyle='--', alpha=0.7)
-            plt.ylim(-0.5, 10.5)
+    # Plotting
+    if not all_judge_scores:
+        print("No scores to plot.")
+        exit()
 
-            # Generate a filename based on model, judge, and timestamp
-            timestamp = datetime.datetime.now().strftime("%H%M%S")
-            safe_model = MODEL.replace("/", "_").replace(":", "_")
-            safe_judge = judge_model_id.replace("/", "_").replace(":", "_")
-            # TODO: if test mode, include test in if the file name
-            plot_filename = os.path.join(log_dir, f"anger_plot_{safe_model}_judge_{safe_judge}_{timestamp}.png")
+    if len(all_judge_scores) == 1:
+        judge_model_id, anger_scores = all_judge_scores[0]
 
-            plt.savefig(plot_filename)
-            print(f"  Plot saved to: {plot_filename}")
+        plt.figure(figsize=(10, 6))
+        plt.plot(range(1, len(anger_scores) + 1), anger_scores, marker='o', linestyle='-', color='r')
+        plt.xlabel("Turn")
+        plt.ylabel("Anger Score")
+        plt.title(f"Anger Level Over Turns\nModel: {MODEL} | Judge: {judge_model_id}")
+        plt.grid(True, linestyle='--', alpha=0.7)
+        plt.ylim(-0.5, 10.5)
+
+        timestamp = datetime.datetime.now().strftime("%H%M%S")
+        safe_model = MODEL.replace("/", "_").replace(":", "_")
+        safe_judge = judge_model_id.replace("/", "_").replace(":", "_")
+        plot_filename = os.path.join(log_dir, f"anger_plot_{safe_model}_judge_{safe_judge}_{timestamp}.png")
+        plt.savefig(plot_filename)
+        print(f"\n  Plot saved to: {plot_filename}")
+
+    else:
+        # assert that have judge scores of all same length
+        min_turns = min(len(scores) for _, scores in all_judge_scores)
+        trimmed = [scores[:min_turns] for _, scores in all_judge_scores]
+        np_array_anger_scores = np.array(trimmed)
+        means = np_array_anger_scores.mean(axis=0)
+        stds = np_array_anger_scores.std(axis=0)
+        turns = range(1, min_turns + 1)
+
+        plt.figure(figsize=(10, 6))
+        plt.errorbar(turns, means, yerr=stds, marker='o', linestyle='-', color='r', capsize=5)
+        plt.xlabel("Turn")
+        plt.ylabel("Anger Score")
+        plt.title(f"Anger Level Over Turns (Mean ± SD)\nModel: {MODEL} | {len(all_judge_scores)} judges")
+        plt.grid(True, linestyle='--', alpha=0.7)
+        plt.ylim(-0.5, 10.5)
+        plt.xticks(turns)
+
+        timestamp = datetime.datetime.now().strftime("%H%M%S")
+        safe_model = MODEL.replace("/", "_").replace(":", "_")
+        plot_filename = os.path.join(log_dir, f"anger_plot_{safe_model}_multi_judge_{timestamp}.png")
+        plt.savefig(plot_filename)
+        print(f"\n  Plot saved to: {plot_filename}")
