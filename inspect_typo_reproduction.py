@@ -14,7 +14,7 @@ from src.inspect_llm_judge import multi_turn_anger_scocer
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--model", default="openrouter/poolside/laguna-m.1:free")
-    parser.add_argument("--judge-model", default="openrouter/qwen/qwen3-next-80b-a3b-instruct:free")
+    parser.add_argument("--judge-model", default="openrouter/deepseek/deepseek-v4-flash")
     parser.add_argument("--log-file", help="Path to an existing .eval log file to re-score")
     args = parser.parse_args()
 
@@ -31,7 +31,7 @@ if __name__ == "__main__":
         
         # Clear existing scores to ensure we use the new ones
         for sample in log.samples:
-            sample.score = None
+            # sample.score = None
             sample.scores = {}
 
         new_log = score(log, scorers=[multi_turn_anger_scocer(judge_model_id=args.judge_model)])

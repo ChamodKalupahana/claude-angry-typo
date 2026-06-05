@@ -5,7 +5,7 @@ from inspect_ai.model import ChatMessageUser, ChatMessageSystem, get_model
 from inspect_ai.scorer import Score, Target
 
 @scorer(metrics=[])
-def multi_turn_anger_scocer(judge_model_id="openrouter/qwen/qwen3-next-80b-a3b-instruct:free"):
+def multi_turn_anger_scocer(judge_model_id="openrouter/deepseek/deepseek-v4-flash"):
     async def score(state: TaskState, target: Target):
         judge_model = get_model(judge_model_id)
 

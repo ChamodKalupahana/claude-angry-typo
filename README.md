@@ -73,7 +73,16 @@ python inspect_typo_reproduction.py --model "openrouter/x-ai/grok-4.1-fast" --ju
 # Re-run judge on specific runs
 python inspect_typo_reproduction.py --log-file logs/2026-05-09/2026-05-09T14-27-35-00-00_eval-anger-against-typo_e9xCVtNCGdN7SGiUvxxRPA.eval --judge-model openrouter/poolside/laguna-xs.2:free
 python inspect_typo_reproduction.py --log-file logs/2026-05-09/2026-05-09T15-45-20-00-00_eval-anger-against-typo_Snc8QbR775PR2mwb92Mhz9.eval --judge-model openrouter/google/gemma-4-31b-it:free
+python inspect_typo_reproduction.py --log-file "logs/2026-05-10/2026-05-10T14-48-48-00-00_eval-anger-against-typo_ZabUBuPovRvZh232V7oCsp copy.eval" --judge-model openrouter/deepseek/deepseek-v4-flash
+
+# using nitro with high throughout for quick cheap test
+python inspect_typo_reproduction.py --model "openrouter/meta-llama/llama-3.1-8b-instruct:nitro" --judge-model openrouter/meta-llama/llama-3.1-8b-instruct:nitro
 ```
 
-# mutiple judges
+Re-running judges on specific runs will overwrite previous scores
+
+## mutiple judges
+Since judges can be noisy, best to use mutiple judges and take avg.
+```bash
 python inspect_typo_reproduction.py --log-file logs/2026-05-09/2026-05-09T14-27-35-00-00_eval-anger-against-typo_e9xCVtNCGdN7SGiUvxxRPA.eval --judge-model openrouter/qwen/qwen3.5-flash-02-23 openrouter/inclusionai/ring-2.6-1t openrouter/deepseek/deepseek-v4-flash
+```
