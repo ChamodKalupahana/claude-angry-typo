@@ -87,7 +87,8 @@ if __name__ == "__main__":
         timestamp = datetime.datetime.now().strftime("%H%M%S")
         safe_model = MODEL.replace("/", "_").replace(":", "_")
         safe_judge = judge_model_id.replace("/", "_").replace(":", "_")
-        plot_filename = os.path.join(log_dir, f"anger_plot_{safe_model}_judge_{safe_judge}_{timestamp}.png")
+        suffix = "_test" if args.test_mode else ""
+        plot_filename = os.path.join(log_dir, f"anger_plot_{safe_model}_judge_{safe_judge}{suffix}_{timestamp}.png")
         plt.savefig(plot_filename)
         print(f"\n  Plot saved to: {plot_filename}")
 
@@ -111,6 +112,13 @@ if __name__ == "__main__":
 
         timestamp = datetime.datetime.now().strftime("%H%M%S")
         safe_model = MODEL.replace("/", "_").replace(":", "_")
-        plot_filename = os.path.join(log_dir, f"anger_plot_{safe_model}_multi_judge_{timestamp}.png")
+        suffix_parts = []
+        if args.test_mode:
+            suffix_parts.append("test")
+        if len(args.judge_model) > 1:
+            safe_judges = "_".join(j.replace("/", "_").replace(":", "_") for j in args.judge_model)
+            suffix_parts.append(safe_judges)
+        suffix = "_".join(suffix_parts)
+        plot_filename = os.path.join(log_dir, f"anger_plot_{safe_model}_multi_judge_{suffix}_{timestamp}.png")
         plt.savefig(plot_filename)
         print(f"\n  Plot saved to: {plot_filename}")

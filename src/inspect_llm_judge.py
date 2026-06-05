@@ -44,8 +44,8 @@ def anger_scorer_factory(judge_model_id="openrouter/deepseek/deepseek-v4-flash",
     async def score(state: TaskState, target: Target):
         if test_mode:
             rng = random.Random(seed)
-            # TODO: use len(user_prompts) instead of hardcoded value
-            num_of_turns = 20
+            turns = _extract_turns(state.messages)
+            num_of_turns = len(turns) if turns else 1
             anger_scores = [rng.uniform(0, 10) for _ in range(num_of_turns)]
 
             return Score(
