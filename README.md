@@ -89,4 +89,7 @@ python inspect_typo_reproduction.py --log-file logs/2026-05-09/2026-05-09T14-27-
 
 # sonnet copy test
 python inspect_typo_reproduction.py --log-file "logs/2026-05-10/2026-05-10T14-48-48-00-00_eval-anger-against-typo_ZabUBuPovRvZh232V7oCsp copy.eval" --judge-model openrouter/qwen/qwen3.5-flash-02-23 openrouter/inclusionai/ring-2.6-1t openrouter/deepseek/deepseek-v4-flash 
+
+# sycophancy judge
+python inspect_sycophancy_reproduction.py --log-file "logs/2026-05-10/2026-05-10T14-48-48-00-00_eval-anger-against-typo_ZabUBuPovRvZh232V7oCsp copy.eval" --judge-model openrouter/qwen/qwen3.5-flash-02-23 openrouter/inclusionai/ring-2.6-1t openrouter/deepseek/deepseek-v4-flash
 ```
